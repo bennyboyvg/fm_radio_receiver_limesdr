@@ -4,22 +4,10 @@
 # GNU Radio Python Flow Graph
 # Title: FM Broadcast Radio Receiver for the LimeSDR-mini
 # Author: Ben Van Ginneken
-# Generated: Sat Dec  7 12:09:59 2019
+# Generated: Thu Jan  9 18:48:59 2020
 ##################################################
 
-from distutils.version import StrictVersion
 
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print "Warning: failed to XInitThreads()"
-
-from PyQt5 import Qt, QtCore
 from gnuradio import analog
 from gnuradio import audio
 from gnuradio import eng_notation
@@ -29,39 +17,12 @@ from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from optparse import OptionParser
 import limesdr
-import sys
-from gnuradio import qtgui
 
 
-class fm_radio_receiver_limesdr_v0_1(gr.top_block, Qt.QWidget):
+class fm_radio_receiver_limesdr_v0_1(gr.top_block):
 
     def __init__(self):
         gr.top_block.__init__(self, "FM Broadcast Radio Receiver for the LimeSDR-mini")
-        Qt.QWidget.__init__(self)
-        self.setWindowTitle("FM Broadcast Radio Receiver for the LimeSDR-mini")
-        qtgui.util.check_set_qss()
-        try:
-            self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
-        except:
-            pass
-        self.top_scroll_layout = Qt.QVBoxLayout()
-        self.setLayout(self.top_scroll_layout)
-        self.top_scroll = Qt.QScrollArea()
-        self.top_scroll.setFrameStyle(Qt.QFrame.NoFrame)
-        self.top_scroll_layout.addWidget(self.top_scroll)
-        self.top_scroll.setWidgetResizable(True)
-        self.top_widget = Qt.QWidget()
-        self.top_scroll.setWidget(self.top_widget)
-        self.top_layout = Qt.QVBoxLayout(self.top_widget)
-        self.top_grid_layout = Qt.QGridLayout()
-        self.top_layout.addLayout(self.top_grid_layout)
-
-        self.settings = Qt.QSettings("GNU Radio", "fm_radio_receiver_limesdr_v0_1")
-
-        if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-            self.restoreGeometry(self.settings.value("geometry").toByteArray())
-        else:
-            self.restoreGeometry(self.settings.value("geometry", type=QtCore.QByteArray))
 
         ##################################################
         # Variables
@@ -104,11 +65,6 @@ class fm_radio_receiver_limesdr_v0_1(gr.top_block, Qt.QWidget):
         self.connect((self.limesdr_source_0, 0), (self.rational_resampler_xxx_0, 0))
         self.connect((self.rational_resampler_xxx_0, 0), (self.analog_wfm_rcv_0, 0))
 
-    def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "fm_radio_receiver_limesdr_v0_1")
-        self.settings.setValue("geometry", self.saveGeometry())
-        event.accept()
-
     def get_samp_rate(self):
         return self.samp_rate
 
@@ -150,20 +106,14 @@ class fm_radio_receiver_limesdr_v0_1(gr.top_block, Qt.QWidget):
 
 def main(top_block_cls=fm_radio_receiver_limesdr_v0_1, options=None):
 
-    if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-        style = gr.prefs().get_string('qtgui', 'style', 'raster')
-        Qt.QApplication.setGraphicsSystem(style)
-    qapp = Qt.QApplication(sys.argv)
-
     tb = top_block_cls()
     tb.start()
-    tb.show()
-
-    def quitting():
-        tb.stop()
-        tb.wait()
-    qapp.aboutToQuit.connect(quitting)
-    qapp.exec_()
+    try:
+        raw_input('Press Enter to quit: ')
+    except EOFError:
+        pass
+    tb.stop()
+    tb.wait()
 
 
 if __name__ == '__main__':
